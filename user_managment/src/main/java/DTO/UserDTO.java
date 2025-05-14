@@ -2,6 +2,7 @@ package DTO;
 
 import java.io.Serializable;
 
+import models.Company;
 import models.Role;
 import models.User;
 
@@ -11,16 +12,18 @@ public class UserDTO implements Serializable {
     private String name;
     private String username;
     private Role role;
+    private String company_name;
 
     public UserDTO() {
         // Required for frameworks like Jackson or JSON-B
     }
 
-    public UserDTO(Long id, String name, String username, Role role) {
+    public UserDTO(Long id, String name, String username, Role role, Company c) {
         this.id = id;
         this.name = name;
         this.username = username;
         this.role = role;
+        this.company_name = c != null ? c.getName() : null;
     }
 
     public static UserDTO from(User user) {
@@ -28,7 +31,8 @@ public class UserDTO implements Serializable {
             user.getId(),
             user.getName(),
             user.getUsername(),
-            user.getRole()
+            user.getRole(),
+            (user.getRole() == Role.SELLER_REPRESENTATIVE) ? user.getCompany() : null
         );
     }
 
@@ -64,4 +68,12 @@ public class UserDTO implements Serializable {
     public void setRole(Role role) {
         this.role = role;
     }
+
+	public String getCompanyName() {
+		return company_name;
+	}
+
+	public void setCompanyName(String company_name) {
+		this.company_name = company_name;
+	}
 }
