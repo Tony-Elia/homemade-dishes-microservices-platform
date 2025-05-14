@@ -20,6 +20,7 @@ import DTO.UserDTO;
 import DTO.UserRequest;
 import models.Role;
 import models.User;
+import rest.filters.AllowedRoles;
 import services.UserService;
 
 @RequestScoped
@@ -31,18 +32,21 @@ public class UserController {
 	private UserService service;
 
 	@POST
-	public Response create(final UserRequest user) {
-		UserDTO newUser = service.create(user);
+	@Path("/register/customer")
+	@AllowedRoles({Role.CUSTOMER, Role.ADMIN})
+	public Response createCustomer(final UserRequest user) {
+		UserDTO newUser = service.create(user, Role.CUSTOMER);
 		return Response.status(newUser == null ? Status.BAD_REQUEST : Status.CREATED).entity(newUser).build();
 	}
 	
 	@POST
-	@Path("/authenticate")
-	public Response authenticate(LoginRequest request) {
-		UserDTO user = service.authenticate(request.getUsername(), request.getPassword());
-		return Response.ok().entity(user).build();
+	@Path("/register/representative")
+	@AllowedRoles({Role.ADMIN})
+	public Response createRepresentative(final UserRequest user) {
+		UserDTO newUser = service.create(user, Role.SELLER_REPRESENTATIVE);
+		return Response.status(newUser == null ? Status.BAD_REQUEST : Status.CREATED).entity(newUser).build();
 	}
-
+	
 	@GET
 	@Path("/{id:[0-9][0-9]*}")
 	public Response findById(@PathParam("id") final Long id) {
@@ -55,12 +59,14 @@ public class UserController {
 
 	@GET
 	@Path("/customers")
+	@AllowedRoles({Role.ADMIN})
 	public List<UserDTO> listAllCustomers() {
 		return service.all(Role.CUSTOMER);
 	}
 	
 	@GET
 	@Path("/seller-representatives")
+	@AllowedRoles({Role.ADMIN})
 	public List<UserDTO> listAllRepresentatives() {
 		List<UserDTO> all = service.all(Role.SELLER_REPRESENTATIVE);
 		System.out.println(all);

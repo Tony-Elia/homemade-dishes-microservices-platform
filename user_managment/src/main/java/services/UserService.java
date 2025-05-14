@@ -19,25 +19,13 @@ public class UserService {
 	@Inject
 	EntityManager em;
 
-	public UserDTO authenticate(String username, String password) {
-		List<User> users = em.createQuery("SELECT u FROM User u WHERE username = :username AND password = :password", User.class)
-				.setParameter("username", username)
-				.setParameter("password", password).getResultList();
-		
-		if(users.isEmpty()) throw new ServiceException("Username or password do not match our records", 404);
-		return UserDTO.fromWithoutPassword(users.get(0));
-	}
-
-	public UserDTO create(UserRequest u) {
+	public UserDTO create(UserRequest u, Role role) {
 		if(usernameExist(u.getUsername()))
 			throw new ServiceException("Username is already in use", 409);
 		
-		if(u.getPassword().isEmpty())
-			throw new ServiceException("Password cannot be null", 400);
-		
 		User newUser = new User();
 		newUser.setRole(Role.CUSTOMER); // Force creation to Customers or Representatives only
-		if(u.getRole() == Role.SELLER_REPRESENTATIVE) {
+		if(role == Role.SELLER_REPRESENTATIVE) {
 			Company c = em.find(Company.class, u.getCompany_id());
 			if(c == null) throw new ServiceException("Company ID Not Found", 404);
 			if(c.getRepresentative() != null) throw new ServiceException("Company Has Already a Repesentative", 400);
@@ -47,9 +35,8 @@ public class UserService {
 		
 		newUser.setName(u.getName());
 		newUser.setUsername(u.getUsername());
-		newUser.setPassword(u.getPassword());
 		em.persist(newUser);
-		return UserDTO.fromWithoutPassword(newUser);
+		return UserDTO.from(newUser);
 	}
 	
 	public boolean usernameExist(String username) {
@@ -58,7 +45,7 @@ public class UserService {
 
 	public UserDTO findById(Long id) {
 		User user = em.find(User.class, id);
-		return user != null ? UserDTO.fromWithoutPassword(user) : null;
+		return user != null ? UserDTO.from(user) : null;
 	}
 
 	public List<UserDTO> all(Role role) {
@@ -67,7 +54,7 @@ public class UserService {
 		List<UserDTO> resUsers = new ArrayList<>();
 		
 		for(User u : users) {
-			resUsers.add(UserDTO.fromWithoutPassword(u));
+			resUsers.add(UserDTO.from(u));
 		}
 		return resUsers;
 	}
@@ -81,7 +68,7 @@ public class UserService {
 			user.setCompany(u.getCompany());
 		
 		em.merge(user);
-		return UserDTO.fromWithoutPassword(user);
+		return UserDTO.from(user);
 	}
 
 	public boolean delete(Long id) {

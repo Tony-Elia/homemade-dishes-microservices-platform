@@ -16,7 +16,6 @@ public class User {
 	private Long id;
 	private String name;
 	private String username;
-	private String password;
 	
 	@Enumerated(EnumType.STRING)
 	private Role role;
@@ -26,13 +25,11 @@ public class User {
 	
 	public Long getId() { return id; }
 	public String getUsername() { return username; }
-	public String getPassword() { return password; }
 	public Role getRole() { return role; }
 	public Company getCompany() {
 		return company;
 	}
 	public void setUsername(String s) { username = s; }
-	public void setPassword(String s) { password = s; }
 	public void setRole(Role r) { role = r; }
 	public void setCompany(Company c) { company = c; }
 	public String getName() {

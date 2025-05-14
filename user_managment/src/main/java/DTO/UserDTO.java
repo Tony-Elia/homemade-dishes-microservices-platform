@@ -10,18 +10,16 @@ public class UserDTO implements Serializable {
     private Long id;
     private String name;
     private String username;
-    private String password;
     private Role role;
 
     public UserDTO() {
         // Required for frameworks like Jackson or JSON-B
     }
 
-    public UserDTO(Long id, String name, String username, String password, Role role) {
+    public UserDTO(Long id, String name, String username, Role role) {
         this.id = id;
         this.name = name;
         this.username = username;
-        this.password = password;
         this.role = role;
     }
 
@@ -30,17 +28,6 @@ public class UserDTO implements Serializable {
             user.getId(),
             user.getName(),
             user.getUsername(),
-            user.getPassword(),
-            user.getRole()
-        );
-    }
-
-    public static UserDTO fromWithoutPassword(User user) {
-        return new UserDTO(
-            user.getId(),
-            user.getName(),
-            user.getUsername(),
-            null,
             user.getRole()
         );
     }
@@ -68,14 +55,6 @@ public class UserDTO implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public Role getRole() {

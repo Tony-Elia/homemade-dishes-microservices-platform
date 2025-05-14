@@ -16,6 +16,8 @@ import javax.ws.rs.core.UriBuilder;
 
 import DTO.CompanyDTO;
 import models.Company;
+import models.Role;
+import rest.filters.AllowedRoles;
 import services.CompanyService;
 
 @RequestScoped
@@ -28,6 +30,7 @@ public class CompanyController {
 	CompanyService service;
 	
 	@POST
+	@AllowedRoles({Role.ADMIN})
 	public Response create(final Company company) {
 		CompanyDTO comp = service.create(company);
 		return Response.status(comp != null ? Status.CREATED : Status.BAD_REQUEST).entity(comp).build();

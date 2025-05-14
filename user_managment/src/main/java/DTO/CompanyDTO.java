@@ -26,7 +26,7 @@ public class CompanyDTO implements Serializable {
             c.getId(),
             c.getName(),
             c.getRegion(),
-            c.getRepresentative() != null ? UserDTO.fromWithoutPassword(c.getRepresentative()) : null
+            c.getRepresentative() != null ? UserDTO.from(c.getRepresentative()) : null
         );
     }
 
