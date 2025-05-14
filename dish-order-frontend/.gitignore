@@ -21,3 +21,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+echo 'target/' >> .gitignore
+git rm -r --cached target/
+target/
