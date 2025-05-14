@@ -12,7 +12,7 @@ public class UserDTO implements Serializable {
     private String name;
     private String username;
     private Role role;
-    private String company_name;
+    private CompanyDTO company;
 
     public UserDTO() {
         // Required for frameworks like Jackson or JSON-B
@@ -23,7 +23,7 @@ public class UserDTO implements Serializable {
         this.name = name;
         this.username = username;
         this.role = role;
-        this.company_name = c != null ? c.getName() : null;
+        this.company = c != null ? new CompanyDTO(c.getId(), c.getName(), c.getRegion(), null) : null;
     }
 
     public static UserDTO from(User user) {
@@ -69,11 +69,7 @@ public class UserDTO implements Serializable {
         this.role = role;
     }
 
-	public String getCompanyName() {
-		return company_name;
-	}
-
-	public void setCompanyName(String company_name) {
-		this.company_name = company_name;
+	public CompanyDTO getCompany() {
+		return company;
 	}
 }
