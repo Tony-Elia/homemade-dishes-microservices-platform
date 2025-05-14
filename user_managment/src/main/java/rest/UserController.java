@@ -43,7 +43,7 @@ public class UserController {
 	@Path("/register/representative")
 	@AllowedRoles({Role.ADMIN})
 	public Response createRepresentative(final UserRequest user) {
-		UserDTO newUser = service.create(user, Role.SELLER_REPRESENTATIVE);
+		UserDTO newUser = service.create(user, Role.SELLER);
 		return Response.status(newUser == null ? Status.BAD_REQUEST : Status.CREATED).entity(newUser).build();
 	}
 	
@@ -68,7 +68,7 @@ public class UserController {
 	@Path("/seller-representatives")
 	@AllowedRoles({Role.ADMIN})
 	public List<UserDTO> listAllRepresentatives() {
-		List<UserDTO> all = service.all(Role.SELLER_REPRESENTATIVE);
+		List<UserDTO> all = service.all(Role.SELLER);
 		System.out.println(all);
 		return all;
 	}

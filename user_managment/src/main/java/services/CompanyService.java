@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
@@ -17,6 +19,7 @@ public class CompanyService {
 	@Inject
 	EntityManager em;
 
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public CompanyDTO create(Company company) {
 		if(company.getName().isEmpty())
 			throw new ServiceException("Company Name cannot be null", 400);
@@ -50,6 +53,7 @@ public class CompanyService {
 		return resCompanies;
 	}
 
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public boolean attachRepresentative(Long id, Long rep_id) {
 		Company company = em.find(Company.class, id);
 		User rep = em.find(User.class, rep_id);

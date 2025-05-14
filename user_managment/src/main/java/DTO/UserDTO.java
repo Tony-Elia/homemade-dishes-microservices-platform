@@ -32,7 +32,7 @@ public class UserDTO implements Serializable {
             user.getName(),
             user.getUsername(),
             user.getRole(),
-            (user.getRole() == Role.SELLER_REPRESENTATIVE) ? user.getCompany() : null
+            (user.getRole() == Role.SELLER) ? user.getCompany() : null
         );
     }
 

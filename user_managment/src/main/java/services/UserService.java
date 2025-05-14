@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
@@ -19,18 +21,19 @@ public class UserService {
 	@Inject
 	EntityManager em;
 
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public UserDTO create(UserRequest u, Role role) {
 		if(usernameExist(u.getUsername()))
 			throw new ServiceException("Username is already in use", 409);
 		
 		User newUser = new User();
 		newUser.setRole(Role.CUSTOMER); // Force creation to Customers or Representatives only
-		if(role == Role.SELLER_REPRESENTATIVE) {
+		if(role == Role.SELLER) {
 			Company c = em.find(Company.class, u.getCompany_id());
 			if(c == null) throw new ServiceException("Company ID Not Found", 404);
 			if(c.getRepresentative() != null) throw new ServiceException("Company Has Already a Repesentative", 400);
 			c.setRepresentative(newUser);
-			newUser.setRole(Role.SELLER_REPRESENTATIVE);
+			newUser.setRole(Role.SELLER);
 		}
 		
 		newUser.setName(u.getName());
@@ -59,12 +62,13 @@ public class UserService {
 		return resUsers;
 	}
 
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public UserDTO update(Long id, User u) {
 		User user = em.find(User.class, id);
 		if(user == null) return null;
 		
 		user.setName(u.getName());
-		if(user.getRole() == Role.SELLER_REPRESENTATIVE)
+		if(user.getRole() == Role.SELLER)
 			user.setCompany(u.getCompany());
 		
 		em.merge(user);

@@ -23,7 +23,7 @@ public class CompaniesSeeder {
         if (em.createQuery("SELECT COUNT(u) FROM Company u", Long.class).getSingleResult() == 0) {
         	User rep = new User();
         	rep.setName("Ahmed 3");
-        	rep.setRole(Role.SELLER_REPRESENTATIVE);
+        	rep.setRole(Role.SELLER);
         	rep.setUsername("ahmed_rep_3");
         	em.persist(rep);
         	
