@@ -1,0 +1,17 @@
+services/CompanyService.class
+models/Role.class
+models/User.class
+DB/seeders/CompaniesSeeder.class
+services/exceptions/ServiceExceptionMapper.class
+DTO/UserDTO.class
+rest/UserController.class
+rest/EntityManagerProducer.class
+DTO/CompanyDTO.class
+services/UserService.class
+rest/CompanyController.class
+DB/seeders/UsersSeeder.class
+DTO/LoginRequest.class
+rest/AppConfig.class
+DTO/UserRequest.class
+services/exceptions/ServiceException.class
+models/Company.class
