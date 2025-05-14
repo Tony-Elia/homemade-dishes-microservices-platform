@@ -15,7 +15,7 @@ import models.User;
 @Startup
 public class CompaniesSeeder {
 
-    @PersistenceContext(unitName = "userPU")
+    @Inject
     private EntityManager em;
 
     @PostConstruct
