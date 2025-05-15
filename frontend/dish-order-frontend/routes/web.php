@@ -23,8 +23,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/seller-representatives', [\App\Http\Controllers\Admin\AdminSellerRepController::class, 'index'])->name('admin.seller_representatives');
     
     // Routes for AdminCompanyController
-    Route::get('/admin/companies', [\App\Http\Controllers\Admin\AdminCompanyController::class, 'index'])->name('admin.companies.create');
+    Route::get('/admin/companies', [\App\Http\Controllers\Admin\AdminCompanyController::class, 'index'])->name('admin.companies');
     Route::post('/admin/companies', [\App\Http\Controllers\Admin\AdminCompanyController::class, 'store'])->name('admin.companies.store');
+    Route::get('/admin/seller/create', [\App\Http\Controllers\Admin\AdminSellerRepController::class, 'create'])->name('admin.seller.create');
 });
 
 Route::middleware(['auth', 'role:seller'])->group(function () {
@@ -33,10 +34,10 @@ Route::middleware(['auth', 'role:seller'])->group(function () {
 
 Route::middleware(['auth', 'role:customer'])->group(function () {
     // customer-only routes
-    Route::get('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'index'])->name('customer.profile');
-    Route::get('/customer/profile/edit', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'edit'])->name('customer.profile.edit');
-    Route::patch('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'update'])->name('customer.profile.update');
-    Route::delete('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'destroy'])->name('customer.profile.destroy');
+    // Route::get('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'index'])->name('customer.profile');
+    // Route::get('/customer/profile/edit', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'edit'])->name('customer.profile.edit');
+    // Route::patch('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'update'])->name('customer.profile.update');
+    // Route::delete('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'destroy'])->name('customer.profile.destroy');
 });
 
 

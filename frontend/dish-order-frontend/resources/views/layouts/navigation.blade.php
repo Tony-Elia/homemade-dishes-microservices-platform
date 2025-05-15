@@ -26,6 +26,9 @@
                         <x-nav-link :href="route('admin.companies.create')" :active="request()->routeIs('admin.companies.create')">
                             {{ __('Create Companies') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('admin.companies')" :active="request()->routeIs('admin.companies')">
+                            {{ __('Manage Companies') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
