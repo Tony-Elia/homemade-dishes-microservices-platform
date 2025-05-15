@@ -22,7 +22,7 @@
                 <tr>
                     <td class="border p-2">{{ $rep['id'] }}</td>
                     <td class="border p-2">{{ $rep['name'] }}</td>
-                    <td class="border p-2">{{ $rep['username'] }}</td>
+                    <td class="border p-2">{{ $rep['email'] }}</td>
                     <td class="border p-2">{{ $rep['companyName'] ?? 'N/A' }}</td>
                 </tr>
                 @endforeach

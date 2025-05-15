@@ -21,7 +21,7 @@
 
             <div>
                 <label class="block mb-1 font-semibold">Username</label>
-                <input type="text" name="username" class="border rounded p-2 w-full" placeholder="Username">
+                <input type="email" name="email" class="border rounded p-2 w-full" placeholder="Username">
             </div>
 
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
