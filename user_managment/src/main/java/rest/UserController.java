@@ -15,7 +15,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import DTO.LoginRequest;
 import DTO.UserDTO;
 import DTO.UserRequest;
 import models.Role;
@@ -48,9 +47,9 @@ public class UserController {
 	}
 	
 	@GET
-	@Path("/{id:[0-9][0-9]*}")
-	public Response findById(@PathParam("id") final Long id) {
-		UserDTO user = service.findById(id);
+	@Path("/{email}")
+	public Response findById(@PathParam("email") final String email) {
+		UserDTO user = service.findByEmail(email);
 		if (user == null) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
@@ -68,22 +67,20 @@ public class UserController {
 	@Path("/seller-representatives")
 	@AllowedRoles({Role.ADMIN})
 	public List<UserDTO> listAllRepresentatives() {
-		List<UserDTO> all = service.all(Role.SELLER);
-		System.out.println(all);
-		return all;
+		return service.all(Role.SELLER);
 	}
 
 	@PUT
-	@Path("/{id:[0-9][0-9]*}")
-	public Response update(@PathParam("id") Long id, final User user) {
-		UserDTO newUser = service.update(id, user);
-		return Response.status(newUser != null ? Status.OK : Status.NOT_FOUND).entity(newUser).build();
+	@Path("/{email}")
+	public Response update(@PathParam("email") String email, final UserDTO user) {
+		return Response.ok(service.update(email, user)).build();
 	}
 
 	@DELETE
-	@Path("/{id:[0-9][0-9]*}")
-	public Response deleteById(@PathParam("id") final Long id) {
-		return Response.status(service.delete(id) ? Status.OK : Status.NOT_FOUND).entity("User Deleted Successfully!").build();
+	@Path("/{email}")
+	public Response deleteById(@PathParam("email") final String email) {
+		boolean deleted = service.delete(email);
+		return Response.status(deleted ? Status.OK : Status.NOT_FOUND).entity(deleted ? "User Deleted Successfully!" : "User Not Found!").build();
 	}
 
 }

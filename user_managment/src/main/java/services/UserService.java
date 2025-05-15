@@ -8,6 +8,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import java.util.regex.Pattern;
 
 import DTO.UserDTO;
 import DTO.UserRequest;
@@ -23,32 +24,47 @@ public class UserService {
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public UserDTO create(UserRequest u, Role role) {
-		if(usernameExist(u.getUsername()))
-			throw new ServiceException("Username is already in use", 409);
+		if(emailExist(u.getEmail()))
+			throw new ServiceException("Email is already in use", 409);
+		
+		if(!isValidEmail(u.getEmail()))
+			throw new ServiceException("Email is not valid", 400);
 		
 		User newUser = new User();
 		newUser.setRole(Role.CUSTOMER); // Force creation to Customers or Representatives only
+		newUser.setName(u.getName());
+		newUser.setEmail(u.getEmail());
+		em.persist(newUser);
+		
 		if(role == Role.SELLER) {
 			Company c = em.find(Company.class, u.getCompany_id());
 			if(c == null) throw new ServiceException("Company ID Not Found", 404);
 			if(c.getRepresentative() != null) throw new ServiceException("Company Has Already a Repesentative", 400);
 			c.setRepresentative(newUser);
 			newUser.setRole(Role.SELLER);
+			
+			em.merge(newUser);
+			em.merge(c);
 		}
-		
-		newUser.setName(u.getName());
-		newUser.setUsername(u.getUsername());
-		em.persist(newUser);
 		return UserDTO.from(newUser);
 	}
 	
-	public boolean usernameExist(String username) {
-		return em.createQuery("SELECT COUNT(u) from User u WHERE username = ?1", Long.class).setParameter(1, username).getSingleResult() > 0;
+	public boolean emailExist(String email) {
+		return em.createQuery("SELECT COUNT(u) from User u WHERE email = ?1", Long.class).setParameter(1, email).getSingleResult() > 0;
 	}
 
-	public UserDTO findById(Long id) {
-		User user = em.find(User.class, id);
+	public UserDTO findByEmail(String email) {
+		User user = findEmail(email);
 		return user != null ? UserDTO.from(user) : null;
+	}
+	
+	private User findEmail(String email) {
+		List<User> users = em.createQuery("SELECT u FROM User u WHERE email = ?1", User.class).setParameter(1, email).getResultList();
+		return !users.isEmpty() ? users.get(0) : null;
+	}
+	
+	private boolean isValidEmail(String email) {
+		return Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$").matcher(email).matches();
 	}
 
 	public List<UserDTO> all(Role role) {
@@ -63,23 +79,36 @@ public class UserService {
 	}
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-	public UserDTO update(Long id, User u) {
-		User user = em.find(User.class, id);
-		if(user == null) return null;
+	public UserDTO update(String email, UserDTO u) {
+		User user = findEmail(email);
+		if(user == null) throw new ServiceException("User Not Found", 404);
 		
-		user.setName(u.getName());
-		if(user.getRole() == Role.SELLER)
-			user.setCompany(u.getCompany());
+		if(u.getEmail() != null) {
+			if(!isValidEmail(u.getEmail()))
+				throw new ServiceException("Email is not valid", 400);
+			user.setEmail(u.getEmail());
+		}
+		
+		if(u.getName() != null)
+			user.setName(u.getName());
+		
+		if(user.getRole() == Role.SELLER && u.getCompany() != null) {
+			if(user.getCompany() != null) user.getCompany().setRepresentative(null);
+			Company c = em.find(Company.class, u.getCompany().getId());
+			if(c == null) throw new ServiceException("Company ID Not Found", 404);
+			if(c.getRepresentative() != null) throw new ServiceException("Company Has Already a Repesentative", 400);
+			user.setCompany(c);
+			c.setRepresentative(user);
+		}
 		
 		em.merge(user);
 		return UserDTO.from(user);
 	}
 
-	public boolean delete(Long id) {
-		User user = em.find(User.class, id);
+	public boolean delete(String email) {
+		User user = findEmail(email);
 		if(user == null) throw new ServiceException("User Not Found", 404);
 		em.remove(user);
 		return true;
 	}
-	
 }

@@ -6,21 +6,19 @@ import models.Role;
 public class UserRequest implements Serializable {
 
     private String name;
-    private String username;
-    private String password;
+    private String email;
     private Role role;
-    private Long company_id;
+    private Long companyId;
 
     public UserRequest() {
         // Required for JSON-B / JAX-RS
     }
 
-    public UserRequest(String name, String username, String password, Role role, Long company_id) {
+    public UserRequest(String name, String email, Role role, Long companyId) {
         this.name = name;
-        this.username = username;
-        this.password = password;
+        this.email = email;
         this.role = role;
-        this.company_id = company_id;
+        this.companyId = companyId;
     }
 
     // Getters and setters
@@ -32,20 +30,12 @@ public class UserRequest implements Serializable {
         this.name = name;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setEmail(String username) {
+        this.email = username;
     }
 
     public Role getRole() {
@@ -57,10 +47,10 @@ public class UserRequest implements Serializable {
     }
 
     public Long getCompany_id() {
-        return company_id;
+        return companyId;
     }
 
-    public void setCompany_id(Long company_id) {
-        this.company_id = company_id;
+    public void setCompany_id(Long companyId) {
+        this.companyId = companyId;
     }
 }

@@ -24,7 +24,7 @@ public class CompaniesSeeder {
         	User rep = new User();
         	rep.setName("Ahmed 3");
         	rep.setRole(Role.SELLER);
-        	rep.setUsername("ahmed_rep_3");
+        	rep.setEmail("ahmed_rep_3");
         	em.persist(rep);
         	
         	Company c = new Company();

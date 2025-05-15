@@ -24,7 +24,7 @@ public class UsersSeeder {
             User admin = new User();
             admin.setName("Admin");
             admin.setRole(Role.ADMIN);
-            admin.setUsername("admin");
+            admin.setEmail("admin@email.com");
 
             em.persist(admin);
         }

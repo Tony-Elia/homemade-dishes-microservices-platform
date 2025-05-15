@@ -10,7 +10,7 @@ public class UserDTO implements Serializable {
 
     private Long id;
     private String name;
-    private String username;
+    private String email;
     private Role role;
     private CompanyDTO company;
 
@@ -18,10 +18,10 @@ public class UserDTO implements Serializable {
         // Required for frameworks like Jackson or JSON-B
     }
 
-    public UserDTO(Long id, String name, String username, Role role, Company c) {
+    public UserDTO(Long id, String name, String email, Role role, Company c) {
         this.id = id;
         this.name = name;
-        this.username = username;
+        this.email = email;
         this.role = role;
         this.company = c != null ? new CompanyDTO(c.getId(), c.getName(), c.getRegion(), null) : null;
     }
@@ -30,7 +30,7 @@ public class UserDTO implements Serializable {
         return new UserDTO(
             user.getId(),
             user.getName(),
-            user.getUsername(),
+            user.getEmail(),
             user.getRole(),
             (user.getRole() == Role.SELLER) ? user.getCompany() : null
         );
@@ -53,12 +53,12 @@ public class UserDTO implements Serializable {
         this.name = name;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Role getRole() {
@@ -71,5 +71,13 @@ public class UserDTO implements Serializable {
 
 	public CompanyDTO getCompany() {
 		return company;
+	}
+	
+	public void setCompany(CompanyDTO c) {
+		this.company = c;
+	}
+	
+	public void setCompany_id(Long id) {
+		this.company = new CompanyDTO(id, null, null, null);
 	}
 }
