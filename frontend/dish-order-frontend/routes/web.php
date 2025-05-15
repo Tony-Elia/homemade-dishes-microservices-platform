@@ -33,10 +33,10 @@ Route::middleware(['auth', 'role:seller'])->group(function () {
 
 Route::middleware(['auth', 'role:customer'])->group(function () {
     // customer-only routes
-    Route::get('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'index'])->name('customer.profile');
-    Route::get('/customer/profile/edit', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'edit'])->name('customer.profile.edit');
-    Route::patch('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'update'])->name('customer.profile.update');
-    Route::delete('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'destroy'])->name('customer.profile.destroy');
+    // Route::get('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'index'])->name('customer.profile');
+    // Route::get('/customer/profile/edit', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'edit'])->name('customer.profile.edit');
+    // Route::patch('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'update'])->name('customer.profile.update');
+    // Route::delete('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'destroy'])->name('customer.profile.destroy');
 });
 
 

@@ -11,6 +11,12 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+    protected $api;
+
+    public function __construct(JavaEeApiService $api)
+    {
+        $this->api = $api;
+    }
     /**
      * Display the user's profile form.
      */
@@ -26,16 +32,34 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        try {
+            // First attempt to update Java EE server
+            $this->api->put('/user-management-service/api/users/' . $user->email, [
+                'name' => $request->validated()['name'],
+                'email' => $request->validated()['email'],
+            ]);
+
+            // If Java EE succeeded, then update local database
+            $user->fill($request->validated());
+
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
+            }
+
+            $user->save();
+
+        } catch (\Exception $e) {
+            // Log and return back with error message
+            \Log::error('Failed to update user on Java EE server: ' . $e->getMessage());
+
+            return Redirect::back()->withErrors(['update' => 'Failed to update your profile on the server. Try again later.']);
         }
-
-        $request->user()->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
+
 
     /**
      * Delete the user's account.
@@ -48,8 +72,17 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        Auth::logout();
+        try {
+            // First delete from Java EE
+            $this->api->delete('/user-management-service/api/users/' . $user->email);
+        } catch (\Exception $e) {
+            \Log::error('Failed to delete user on Java EE server: ' . $e->getMessage());
 
+            return Redirect::back()->withErrors(['delete' => 'Failed to delete your profile on the server. Try again later.']);
+        }
+
+        // Only proceed locally if remote delete succeeded
+        Auth::logout();
         $user->delete();
 
         $request->session()->invalidate();
@@ -57,4 +90,5 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
 }
