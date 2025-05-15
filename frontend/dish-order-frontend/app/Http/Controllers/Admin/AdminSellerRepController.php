@@ -15,7 +15,7 @@ class AdminSellerRepController extends Controller
 
     public function index()
     {
-        $reps = $this->api->get('/users/seller-representatives');
+        $reps = $this->api->get('/user-management-service/api/users/seller-representatives');
         return view('admin.seller_reps', compact('reps'));
     }
 }

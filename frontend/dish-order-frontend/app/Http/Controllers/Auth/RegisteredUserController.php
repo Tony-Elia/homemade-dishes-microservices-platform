@@ -14,6 +14,12 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
+    protected $api;
+
+    public function __construct(JavaEeApiService $api)
+    {
+        $this->api = $api;
+    }
     /**
      * Display the registration view.
      */
@@ -31,20 +37,38 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        try {
+            // Create Laravel user locally
+            $user = User::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        event(new Registered($user));
+            // Send user to Java EE API
+            $this->api->post('/user-management-service/api/users/register/customer', [
+                'name'  => $user->name,
+                'email' => $user->email,
+                'role'  => 'customer'
+            ]);
 
-        Auth::login($user);
+            event(new Registered($user));
 
-        return redirect(route('dashboard', absolute: false));
+            Auth::login($user);
+
+            
+
+            return redirect(route('dashboard', absolute: false));
+
+        } catch (\Exception $e) {
+            \Log::error('Failed to register user in Java EE system: ' . $e->getMessage());
+            return redirect()->back()->withErrors([
+                'registration' => 'Failed to register your account on our server. Please try again later.',
+            ])->withInput();
+        }
     }
 }
