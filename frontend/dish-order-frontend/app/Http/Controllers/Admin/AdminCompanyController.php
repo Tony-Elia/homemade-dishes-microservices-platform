@@ -15,7 +15,10 @@ class AdminCompanyController extends Controller
 
     public function index()
     {
-        return view('admin.create_companies');
+        // Fetch all companies from the API
+        $companies = $this->api->get('/user-management-service/api/companies');
+        // Pass the companies data to the view
+        return view('admin.companies', compact('companies'));
     }
 
     public function store()
@@ -31,7 +34,7 @@ class AdminCompanyController extends Controller
         ];
 
         // Use the provided API URL
-        $response = $this->api->post('/companies', $payload);
+        $response = $this->api->post('/user-management-service/api/companies', $payload);
 
         // Check if the API returned an error
         if (isset($response['error']) && $response['error'] === 'Company Name is already in use') {
