@@ -23,8 +23,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/seller-representatives', [\App\Http\Controllers\Admin\AdminSellerRepController::class, 'index'])->name('admin.seller_representatives');
     
     // Routes for AdminCompanyController
-    Route::get('/admin/companies', [\App\Http\Controllers\Admin\AdminCompanyController::class, 'index'])->name('admin.companies.create');
+    Route::get('/admin/companies', [\App\Http\Controllers\Admin\AdminCompanyController::class, 'index'])->name('admin.companies');
     Route::post('/admin/companies', [\App\Http\Controllers\Admin\AdminCompanyController::class, 'store'])->name('admin.companies.store');
+    Route::get('/admin/seller/create', [\App\Http\Controllers\Admin\AdminSellerRepController::class, 'create'])->name('admin.seller.create');
 });
 
 Route::middleware(['auth', 'role:seller'])->group(function () {
