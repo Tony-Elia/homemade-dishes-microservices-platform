@@ -5,20 +5,26 @@
         <table class="w-full table-auto border border-gray-300">
             <thead class="bg-gray-200">
                 <tr>
-                    <th class="border p-2">Dish Name</th>
-                    <th class="border p-2">Customer</th>
-                    <th class="border p-2">Shipping Address</th>
+                    <th class="border p-2">Dish ID</th>
+                    <th class="border p-2">Customer Email</th>
+                    <th class="border p-2">Shipping Company</th>
                     <th class="border p-2">Quantity Sold</th>
+                    <th class="border p-2">Price at Purchase</th>
+                    <th class="border p-2">Order Status</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($soldDishes as $soldDish)
-                <tr>
-                    <td class="border p-2">{{ $soldDish['dish_name'] }}</td>
-                    <td class="border p-2">{{ $soldDish['customer_name'] }}</td>
-                    <td class="border p-2">{{ $soldDish['shipping_address'] }}</td>
-                    <td class="border p-2">{{ $soldDish['quantity'] }}</td>
-                </tr>
+                @foreach ($soldDishes as $order)
+                    @foreach ($order['items'] as $item)
+                        <tr>
+                            <td class="border p-2">{{ $item['dishId'] }}</td>
+                            <td class="border p-2">{{ $order['userEmail'] }}</td>
+                            <td class="border p-2">{{ $order['shippingCompany']['name'] ?? '-' }}</td>
+                            <td class="border p-2">{{ $item['quantity'] }}</td>
+                            <td class="border p-2">${{ $item['priceAtPurchase'] }}</td>
+                            <td class="border p-2">{{ ucfirst(strtolower($order['status'])) }}</td>
+                        </tr>
+                    @endforeach
                 @endforeach
             </tbody>
         </table>
