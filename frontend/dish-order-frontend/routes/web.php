@@ -21,15 +21,27 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Admin routes
     Route::get('/admin/customers', [\App\Http\Controllers\Admin\AdminCustomerController::class, 'index'])->name('admin.customers');
     Route::get('/admin/seller-representatives', [\App\Http\Controllers\Admin\AdminSellerRepController::class, 'index'])->name('admin.seller_representatives');
-    
+
     // Routes for AdminCompanyController
     Route::get('/admin/companies', [\App\Http\Controllers\Admin\AdminCompanyController::class, 'index'])->name('admin.companies');
     Route::post('/admin/companies', [\App\Http\Controllers\Admin\AdminCompanyController::class, 'store'])->name('admin.companies.store');
     Route::get('/admin/seller/create', [\App\Http\Controllers\Admin\AdminSellerRepController::class, 'create'])->name('admin.seller.create');
+    Route::get('/admin/seller/assign/{company_id}', [\App\Http\Controllers\Admin\AdminSellerRepController::class, 'assign'])->name('admin.seller.assign');
 });
 
 Route::middleware(['auth', 'role:seller'])->group(function () {
-    // seller-only routes
+    // Seller dashboard
+    Route::get('/seller/dashboard', function () {
+        return view('seller.dashboard'); // Create a Blade file for the seller dashboard
+    })->name('seller.dashboard');
+
+    // Routes for SellerDishController
+    Route::get('/seller/dishes', [\App\Http\Controllers\Seller\SellerDishController::class, 'index'])->name('seller.dishes.index');
+    Route::get('/seller/dishes/sold', [\App\Http\Controllers\Seller\SellerDishController::class, 'soldDishes'])->name('seller.dishes.sold');
+    Route::get('/seller/dishes/create', [\App\Http\Controllers\Seller\SellerDishController::class, 'create'])->name('seller.dishes.create');
+    Route::post('/seller/dishes', [\App\Http\Controllers\Seller\SellerDishController::class, 'store'])->name('seller.dishes.store');
+    Route::get('/seller/dishes/{id}/edit', [\App\Http\Controllers\Seller\SellerDishController::class, 'edit'])->name('seller.dishes.edit');
+    Route::put('/seller/dishes/{id}', [\App\Http\Controllers\Seller\SellerDishController::class, 'update'])->name('seller.dishes.update');
 });
 
 Route::middleware(['auth', 'role:customer'])->group(function () {
@@ -41,4 +53,4 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

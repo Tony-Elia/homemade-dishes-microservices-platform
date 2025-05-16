@@ -52,6 +52,7 @@ class AdminSellerRepController extends Controller
             'name'     => $validated['name'],
             'email'    => $validated['email'],
             'password' => bcrypt($randomPassword), // Hash the password
+            'company_id' => $validated['company_id'],
             'role'     => 'seller',
         ]);
 
@@ -60,7 +61,7 @@ class AdminSellerRepController extends Controller
             $this->api->post('/user-management-service/api/users/register/representative', [
                 'email' => $validated['email'],
                 'name' => $validated['name'],
-                'company_id' => $validated['company_id'],
+                'companyId' => $validated['company_id'],
             ]);
 
             // Redirect to a success page or back with a success message
