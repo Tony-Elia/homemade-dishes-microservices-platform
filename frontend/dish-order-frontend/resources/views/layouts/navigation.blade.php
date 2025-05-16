@@ -30,6 +30,18 @@
                             {{ __('Manage Companies') }}
                         </x-nav-link>
                     @endif
+
+                    @if (auth()->user()->role === 'customer')
+                        <x-nav-link :href="route('customer.dishes.show_all')" :active="request()->routeIs('customer.dishes.show_all')">
+                            {{ __('Browse Dishes') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('customer.cart')" :active="request()->routeIs('customer.cart')">
+                            {{ __('Cart') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('customer.orders.index')" :active="request()->routeIs('customer.orders.index')">
+                            {{ __('My Orders') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
