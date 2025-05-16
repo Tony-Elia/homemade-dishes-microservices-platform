@@ -6,6 +6,20 @@
             <div class="bg-green-100 text-green-800 p-3 rounded mb-4">{{ session('status') }}</div>
         @endif
 
+        @if(session('last_order_status') === 'pending')
+            <div class="bg-yellow-100 text-yellow-800 p-3 rounded mb-4">
+                Order sent, waiting for confirmation...
+            </div>
+        @elseif(session('last_order_status') === 'accepted')
+            <div class="bg-green-100 text-green-800 p-3 rounded mb-4">
+                Order placed successfully!
+            </div>
+        @elseif(session('last_order_status') === 'rejected')
+            <div class="bg-red-100 text-red-800 p-3 rounded mb-4">
+                Order was rejected.
+            </div>
+        @endif
+
         @if(empty($orders))
             <p>You have no orders yet.</p>
         @else
