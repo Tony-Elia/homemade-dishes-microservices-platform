@@ -31,6 +31,8 @@ class SellerDishController extends Controller
         return view('seller.dishes', compact('dishes'));
     }
 
+   
+
     // View sold dishes with customer & shipping info
     public function soldDishes()
     {

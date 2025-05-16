@@ -45,11 +45,12 @@ Route::middleware(['auth', 'role:seller'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:customer'])->group(function () {
-    // customer-only routes
-    // Route::get('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'index'])->name('customer.profile');
-    // Route::get('/customer/profile/edit', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'edit'])->name('customer.profile.edit');
-    // Route::patch('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'update'])->name('customer.profile.update');
-    // Route::delete('/customer/profile', [\App\Http\Controllers\Customer\CustomerProfileController::class, 'destroy'])->name('customer.profile.destroy');
+    Route::get('/customer/orders', [\App\Http\Controllers\Customer\CustomerOrderController::class, 'index'])->name('customer.orders.index');
+    Route::get('/customer/dishes', [\App\Http\Controllers\Customer\CustomerOrderController::class, 'showAll'])->name('customer.dishes.show_all');
+    Route::post('/customer/cart/add', [\App\Http\Controllers\Customer\CustomerOrderController::class, 'addToCart'])->name('customer.cart.add');
+    Route::get('/customer/cart', [\App\Http\Controllers\Customer\CustomerOrderController::class, 'viewCart'])->name('customer.cart');
+    Route::post('/customer/cart/remove/{dishId}', [\App\Http\Controllers\Customer\CustomerOrderController::class, 'removeFromCart'])->name('customer.cart.remove');
+    Route::post('/customer/cart/place-order', [\App\Http\Controllers\Customer\CustomerOrderController::class, 'placeOrder'])->name('customer.cart.place_order');
 });
 
 
