@@ -78,4 +78,10 @@ public class DishService {
 		checkOwnership(d, companyId);
 		em.remove(d);
 	}
+
+	public DishDTO getById(Long dishId) {
+		Dish dish = em.find(Dish.class, dishId);
+		if(dish == null) throw new ServiceException("Dish Not Found", 404);
+		return DishDTO.from(dish);
+	}
 }

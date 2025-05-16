@@ -40,6 +40,12 @@ public class DishController {
 		return service.listAll(companyId);
 	}
 
+	@GET
+	@Path("/{id:[0-9][0-9]*}")
+	public DishDTO getById(@PathParam("id") Long dishId) {
+		return service.getById(dishId);
+	}
+	
 	@PUT
 	@Path("/{id:[0-9][0-9]*}")
 	public Response update(@HeaderParam("X-Company-Id") Long companyId, @PathParam("id") Long id, final DishDTO dish) {

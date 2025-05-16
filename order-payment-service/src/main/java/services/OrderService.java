@@ -11,6 +11,8 @@ import javax.persistence.EntityManager;
 
 import models.Order;
 import models.OrderItem;
+import models.OrderStatus;
+import models.ShippingCompany;
 import DTO.OrderDTO;
 import services.exceptions.ServiceException;
 
@@ -23,6 +25,8 @@ public class OrderService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public OrderDTO create(Order order) {
 		if(order.hasNullAttr()) throw new ServiceException("Missing some attributes", 400);
+		
+		order.setShippingCompany(findShippinCompanyById(order.getShippingCompany().getId()));
 		
 		List<OrderItem> items = order.getItems();
 		order.setItems(null);
@@ -38,6 +42,7 @@ public class OrderService {
 		}
 		
 		order.setTotalAmount(total);
+		order.setStatus(OrderStatus.REQUESTED);
 		em.persist(order);
 		
 		for(OrderItem i : items) {
@@ -57,5 +62,9 @@ public class OrderService {
 			newOrders.add(OrderDTO.from(o));
 		}
 		return newOrders;
+	}
+	
+	public ShippingCompany findShippinCompanyById(Long id) {
+		return em.find(ShippingCompany.class, id);
 	}
 }

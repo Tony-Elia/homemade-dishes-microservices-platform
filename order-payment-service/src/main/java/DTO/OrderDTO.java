@@ -1,17 +1,8 @@
 package DTO;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import models.Order;
 import models.OrderItem;
+import models.OrderStatus;
+import models.ShippingCompany;
 
 @Getter
 @Setter
@@ -26,9 +19,11 @@ import models.OrderItem;
 @AllArgsConstructor
 public class OrderDTO {
 	private Long id;
-	private Long userId;
+	private String userEmail;
 	private Double totalAmount;
 	private List<OrderItemDTO> items;
+	private ShippingCompany shippingCompany;
+	private OrderStatus status;
 	private Date createdAt;
 	
 	public static OrderDTO from(Order o) {
@@ -37,10 +32,14 @@ public class OrderDTO {
 		for(OrderItem i : items) {
 			newItems.add(OrderItemDTO.fromWithoutOrder(i));
 		}
-		return new OrderDTO(o.getId(), o.getUserId(), o.getTotalAmount(), newItems, o.getCreatedAt());
+		return new OrderDTO(o.getId(), o.getUserEmail(), o.getTotalAmount(), newItems, o.getShippingCompany(), o.getStatus(), o.getCreatedAt());
 	}
 
 	public static OrderDTO fromWithoutItems(Order o) {
-		return new OrderDTO(o.getId(), o.getUserId(), o.getTotalAmount(), null, o.getCreatedAt());
+		return new OrderDTO(o.getId(), o.getUserEmail(), o.getTotalAmount(), null, o.getShippingCompany(), o.getStatus(), o.getCreatedAt());
+	}
+
+	public Order toOrder() {
+		return new Order(id, userEmail, totalAmount, null, shippingCompany, status, createdAt);
 	}
 }

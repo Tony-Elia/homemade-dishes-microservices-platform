@@ -1,16 +1,17 @@
 package models;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
@@ -32,10 +33,17 @@ public class Order {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private Long userId;
+	private String userEmail;
 	private Double totalAmount;
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	private List<OrderItem> items;
+	
+	@ManyToOne
+	@JoinColumn(name = "shipping_company_id")
+	private ShippingCompany shippingCompany;
+	
+	@Enumerated(EnumType.STRING)
+	private OrderStatus status;
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createdAt;
@@ -46,6 +54,10 @@ public class Order {
 	}
 	
 	public boolean hasNullAttr() {
-		return (userId == null) || (items.isEmpty() || items == null);
+		return (userEmail == null) || ( items == null) || items.isEmpty() || (shippingCompany == null) || (shippingCompany.getId() == null);
+	}
+	
+	public void setShippingCompanyId(Long id) {
+		shippingCompany = new ShippingCompany(id, null, null);
 	}
 }
