@@ -13,7 +13,7 @@
                 <tr>
                     <th class="border p-2">ID</th>
                     <th class="border p-2">Name</th>
-                    <th class="border p-2">Username</th>
+                    <th class="border p-2">Email</th>
                     <th class="border p-2">Role</th>
                 </tr>
             </thead>
@@ -22,7 +22,7 @@
                 <tr>
                     <td class="border p-2">{{ $customer['id'] }}</td>
                     <td class="border p-2">{{ $customer['name'] }}</td>
-                    <td class="border p-2">{{ $customer['username'] }}</td>
+                    <td class="border p-2">{{ $customer['email'] }}</td>
                     <td class="border p-2">{{ ucfirst(strtolower($customer['role'])) }}</td>
                 </tr>
                 @endforeach

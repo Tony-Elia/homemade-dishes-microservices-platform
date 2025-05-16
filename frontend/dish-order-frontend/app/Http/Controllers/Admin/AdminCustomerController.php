@@ -16,7 +16,7 @@ class AdminCustomerController extends Controller
     public function index()
     {
         // Fetch all customers from the API
-        $customers = $this->api->get('/users/customers');
+        $customers = $this->api->get('/user-management-service/api/users/customers');
 
         // Pass the customers data to the view
         return view('admin.customers', compact('customers'));

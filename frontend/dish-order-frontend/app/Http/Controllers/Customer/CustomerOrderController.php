@@ -27,31 +27,7 @@ class CustomerOrderController extends Controller
         return view('customer.dishes.show-all', compact('dishes'));
     }
 
-    // Show form to make new order
-    public function create()
-    {
-        $dishes = $this->api->get('/dishes/available');
-        return view('customer.orders.create', compact('dishes'));
-    }
-
-    // Submit new order
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'items' => 'required|array|min:1',
-            'items.*.dish_id' => 'required|integer',
-            'items.*.quantity' => 'required|integer|min:1',
-        ]);
-
-        $response = $this->api->post('/orders', $data);
-
-        if (isset($response['error'])) {
-            return redirect()->back()->withErrors(['order' => $response['error']]);
-        }
-
-        return redirect()->route('customer.orders')->with('status', 'Order placed successfully!');
-    }
-
+    
     // Add dish to cart
     public function addToCart(Request $request)
     {
@@ -127,7 +103,13 @@ class CustomerOrderController extends Controller
             return redirect()->route('customer.cart')->withErrors(['order' => $response['error']]);
         }
 
+        // After successful order placement
+        if (isset($response['orderId'])) {
+            session(['last_order_id' => $response['orderId']]);
+            session(['last_order_status' => 'pending']);
+        }
+
         session()->forget('cart');
-        return redirect()->route('customer.orders')->with('status', 'Order placed successfully!');
+        return redirect()->route('customer.orders')->with('status', 'Order sent, waiting for confirmation...');
     }
 }
