@@ -17,7 +17,8 @@ class CustomerOrderController extends Controller
     // View current and past orders
     public function index()
     {
-        $orders = $this->api->get('/orders/my-orders');
+        $mail = auth()->user()->email;
+        $orders = $this->api->get("/orders/{$mail}");
         return view('customer.orders.index', compact('orders'));
     }
 
@@ -59,7 +60,8 @@ class CustomerOrderController extends Controller
     public function viewCart()
     {
         $cart = session('cart', []);
-        return view('customer.orders.cart', compact('cart'));
+        $shippingCompanies = $this->api->get('order-payment-service/api/shipping-companies');
+        return view('customer.orders.cart', compact('cart', 'shippingCompanies'));
     }
 
     // Remove item from cart
@@ -104,9 +106,15 @@ class CustomerOrderController extends Controller
         }
 
         // After successful order placement
-        if (isset($response['orderId'])) {
-            session(['last_order_id' => $response['orderId']]);
-            session(['last_order_status' => 'pending']);
+        if (isset($response['id'])) {
+            session(['last_order_id' => $response['id']]);
+            session(['last_order_status' => strtolower($response['status'])]); // e.g., 'requested'
+            session()->forget('cart');
+            // Redirect to payment page
+            $paymentDetails = $this->api->get("order-payment-service/api/pay/{$response['id']}");
+            if (isset($paymentDetails['error'])) {
+                return redirect()->route('customer.cart')->withErrors(['payment' => $paymentDetails['error']]);
+            }
         }
 
         session()->forget('cart');

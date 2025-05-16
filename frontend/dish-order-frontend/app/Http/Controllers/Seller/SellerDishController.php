@@ -31,12 +31,18 @@ class SellerDishController extends Controller
         return view('seller.dishes', compact('dishes'));
     }
 
-   
+
 
     // View sold dishes with customer & shipping info
-    public function soldDishes()
+    public function soldDishes(Request $request)
     {
-        $soldDishes = $this->api->get('/orders/my-sold-dishes');
+        $companyId = auth()->user()->company_id ?? $request->header('X-Company-Id');
+
+        // Add the company ID to the headers
+        $headers = [
+            'X-Company-Id' => $companyId,
+        ];
+        $soldDishes = $this->api->get('order-payment-service/api/orders', [], $headers);
         return view('seller.dishes.sold', compact('soldDishes'));
     }
 
