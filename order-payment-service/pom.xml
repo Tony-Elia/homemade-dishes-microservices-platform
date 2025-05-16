@@ -26,6 +26,17 @@
 	  <version>1.18.30</version> <!-- or latest -->
 	  <scope>provided</scope>
 	</dependency>
+	<dependency>
+	    <groupId>com.rabbitmq</groupId>
+	    <artifactId>amqp-client</artifactId>
+	    <version>5.16.0</version> <!-- or latest stable -->
+	</dependency>
+	<dependency>
+	    <groupId>com.fasterxml.jackson.core</groupId>
+	    <artifactId>jackson-databind</artifactId>
+	    <version>2.15.2</version> <!-- Or latest stable -->
+	</dependency>
+
   </dependencies>
   
   <build>

@@ -39,6 +39,12 @@ public class DishController {
 	public List<DishDTO> listAll(@HeaderParam("X-Company-Id") Long companyId) {
 		return service.listAll(companyId);
 	}
+	
+	@GET
+	@Path("/all")
+	public List<DishDTO> listAllForCustomer() {
+		return service.listAll();
+	}
 
 	@GET
 	@Path("/{id:[0-9][0-9]*}")
