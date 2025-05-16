@@ -14,32 +14,32 @@ class JavaEeApiService
         $this->role_header = env('USER_ROLE_HEADER', 'X-User-Role');
     }
 
-    public function get($url)
+    public function get($url, $params = [], $headers = [])
     {
-        return Http::withHeaders([
+        return Http::withHeaders(array_merge([
             $this->role_header => auth()->user()->role,
-        ])->get(env('JAVA_EE_API_URL') . $url)->json();
+        ], $headers))->get(env('JAVA_EE_API_URL') . $url, $params)->json();
     }
 
-    public function post($url, $data)
+    public function post($url, $data, $headers = [])
     {
-        return Http::withHeaders([
+        return Http::withHeaders(array_merge([
             $this->role_header => auth()->user()->role,
-        ])->post(env('JAVA_EE_API_URL') . $url, $data)->json();
+        ], $headers))->post(env('JAVA_EE_API_URL') . $url, $data)->json();
     }
 
-    public function put($url, $data)
+    public function put($url, $data, $headers = [])
     {
-        return Http::withHeaders([
+        return Http::withHeaders(array_merge([
             $this->role_header => auth()->user()->role,
-        ])->put(env('JAVA_EE_API_URL') . $url, $data)->json();
+        ], $headers))->put(env('JAVA_EE_API_URL') . $url, $data)->json();
     }
 
-    public function delete($url)
+    public function delete($url, $headers = [])
     {
-        return Http::withHeaders([
+        return Http::withHeaders(array_merge([
             $this->role_header => auth()->user()->role,
-        ])->delete(env('JAVA_EE_API_URL') . $url)->json();
+        ], $headers))->delete(env('JAVA_EE_API_URL') . $url)->json();
     }
 }
 
