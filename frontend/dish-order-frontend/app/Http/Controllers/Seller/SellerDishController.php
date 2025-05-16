@@ -31,6 +31,12 @@ class SellerDishController extends Controller
         return view('seller.dishes', compact('dishes'));
     }
 
+    public function showAll()
+    {
+        $dishes = $this->api->get("/dish-inventory-service/api/dishes/all");
+        return view('customer.dishes.show-all', compact('dishes'));
+    }
+
     // View sold dishes with customer & shipping info
     public function soldDishes()
     {
