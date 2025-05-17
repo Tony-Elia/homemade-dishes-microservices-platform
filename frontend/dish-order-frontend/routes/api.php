@@ -7,7 +7,7 @@ Route::put('/orders/status', function(Request $request) {
     $status = $request->input('status');
     if (session('last_order_id') == $orderId) {
         session(['last_order_status' => $status]);
-        return response()->json(['message' => 'Order status updated in session.']);
+        return redirect()->view('customer.orders.index');
     } else {
         return response()->json(['error' => 'Order not found in session.'], 404);
     }

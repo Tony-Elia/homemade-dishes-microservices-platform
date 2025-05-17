@@ -18,7 +18,7 @@ class CustomerOrderController extends Controller
     public function index()
     {
         $mail = auth()->user()->email;
-        $orders = $this->api->get("/orders/{$mail}");
+        $orders = $this->api->get("/order-payment-service/api/orders/{$mail}");
 
         // Handle API error
         if (isset($orders['error'])) {
@@ -27,7 +27,11 @@ class CustomerOrderController extends Controller
 
         // Ensure $orders is always an array
         $orders = is_array($orders) ? $orders : [];
-
+        foreach ($orders as &$order) {
+            foreach ($order['items'] as &$item) {
+                $item['dishName'] = $this->api->get("/dish-inventory-service/api/dishes/{$item['dishId']}")['name'];
+            }
+        }
         return view('customer.orders.index', compact('orders'));
     }
 
@@ -46,7 +50,7 @@ class CustomerOrderController extends Controller
         return view('customer.dishes.show-all', compact('dishes'));
     }
 
-    
+
     // Add dish to cart
     public function addToCart(Request $request)
     {
@@ -147,6 +151,13 @@ class CustomerOrderController extends Controller
         }
 
         session()->forget('cart');
-        return redirect()->route('customer.orders')->with('status', 'Order sent, waiting for confirmation...');
+        return redirect()->route('customer.orders.index')->with('status', 'Order sent, waiting for confirmation...');
+    }
+
+    public function payment(Request $request)
+    {
+        $response = $this->api->get("/order-payment-service/api/pay/{$request->query('order_id')}");
+        $response = $response['error'] ?? $response;
+        return redirect()->route('customer.orders.index')->with('status', $response);
     }
 }

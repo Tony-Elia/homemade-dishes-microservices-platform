@@ -31,22 +31,26 @@
                         <th class="border p-2">Status</th>
                         <th class="border p-2">Total</th>
                         <th class="border p-2">Items</th>
+                        <th class="border p-2">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($orders as $order)
                     <tr>
                         <td class="border p-2">{{ $order['id'] ?? '-' }}</td>
-                        <td class="border p-2">{{ $order['created_at'] ?? '-' }}</td>
+                        <td class="border p-2">{{ \Carbon\Carbon::createFromTimestampMs($order['createdAt']) ?? '-' }}</td>
                         <td class="border p-2">{{ $order['status'] ?? '-' }}</td>
-                        <td class="border p-2">${{ $order['total'] ?? '-' }}</td>
+                        <td class="border p-2">${{ $order['totalAmount'] ?? '-' }}</td>
                         <td class="border p-2">
                             <ul>
                                 @foreach ($order['items'] ?? [] as $item)
-                                    <li>{{ $item['name'] ?? 'Dish' }} x{{ $item['quantity'] ?? 1 }}</li>
+                                    <li>({{ $item['dishName'] ?? 'Dish' }}) x {{ $item['quantity'] ?? 1 }} => {{ $item['priceAtPurchase'] }}$</li>
                                 @endforeach
                             </ul>
                         </td>
+                        @if($order['status'] == "UNPAID")
+                            <td class="border p-2 text-blue-700 underline"><a href="{{ route('customer.payment', ['order_id' => $order['id']]) }}">Pay</a></td>
+                        @endif
                     </tr>
                     @endforeach
                 </tbody>
