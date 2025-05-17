@@ -9,7 +9,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -51,6 +51,7 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::get('/customer/cart', [\App\Http\Controllers\Customer\CustomerOrderController::class, 'viewCart'])->name('customer.cart');
     Route::post('/customer/cart/remove/{dishId}', [\App\Http\Controllers\Customer\CustomerOrderController::class, 'removeFromCart'])->name('customer.cart.remove');
     Route::post('/customer/cart/place-order', [\App\Http\Controllers\Customer\CustomerOrderController::class, 'placeOrder'])->name('customer.cart.place_order');
+    Route::get('/customer/payment', [\App\Http\Controllers\Customer\CustomerOrderController::class, 'payment'])->name('customer.payment');
 });
 
 

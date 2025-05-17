@@ -11,20 +11,24 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($dishes as $dish)
-                <tr>
-                    <td>{{ $dish['name'] }}</td>
-                    <td>${{ $dish['price'] }}</td>
-                    <td>
-                        <form action="{{ route('customer.cart.add') }}" method="POST" class="flex items-center">
-                            @csrf
-                            <input type="hidden" name="dish_id" value="{{ $dish['id'] }}">
-                            <input type="number" name="quantity" value="1" min="1" class="border rounded w-16 mr-2">
-                            <button type="submit" class="bg-green-600 text-white px-2 py-1 rounded">Add</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
+                @if(is_array($dishes) && count($dishes))
+                    @foreach ($dishes as $dish)
+                        <tr>
+                            <td>{{ $dish['name'] }}</td>
+                            <td>${{ $dish['price'] }}</td>
+                            <td>
+                                <form action="{{ route('customer.cart.add') }}" method="POST" class="flex items-center">
+                                    @csrf
+                                    <input type="hidden" name="dish_id" value="{{ $dish['id'] }}">
+                                    <input type="number" name="quantity" value="1" min="1" class="border rounded w-16 mr-2">
+                                    <button type="submit" class="bg-green-600 text-white px-2 py-1 rounded">Add</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr><td colspan="3">No dishes available.</td></tr>
+                @endif
             </tbody>
         </table>
     </div>

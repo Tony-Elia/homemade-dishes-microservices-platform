@@ -23,8 +23,9 @@ class JavaEeApiService
 
     public function post($url, $data, $headers = [])
     {
+        $role = auth()->check() ? auth()->user()->role : ($data['role'] ?? 'guest');
         return Http::withHeaders(array_merge([
-            $this->role_header => auth()->user()->role,
+            $this->role_header => $role,
         ], $headers))->post(env('JAVA_EE_API_URL') . $url, $data)->json();
     }
 
