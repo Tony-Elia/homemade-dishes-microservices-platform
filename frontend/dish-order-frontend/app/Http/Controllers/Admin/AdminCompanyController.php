@@ -21,6 +21,11 @@ class AdminCompanyController extends Controller
         return view('admin.companies', compact('companies'));
     }
 
+    public function create()
+    {
+        // Show the form to create a new company
+        return view('admin.create_companies');
+    }
     public function store()
     {
         $data = request()->validate([

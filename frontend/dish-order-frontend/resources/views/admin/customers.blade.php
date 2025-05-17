@@ -18,14 +18,20 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($customers as $customer)
-                <tr>
-                    <td class="border p-2">{{ $customer['id'] }}</td>
-                    <td class="border p-2">{{ $customer['name'] }}</td>
-                    <td class="border p-2">{{ $customer['email'] }}</td>
-                    <td class="border p-2">{{ ucfirst(strtolower($customer['role'])) }}</td>
-                </tr>
-                @endforeach
+                @if(is_array($customers) && count($customers))
+                    @foreach ($customers as $customer)
+                        <tr>
+                            <td class="border p-2">{{ $customer['id'] }}</td>
+                            <td class="border p-2">{{ $customer['name'] }}</td>
+                            <td class="border p-2">{{ $customer['email'] }}</td>
+                            <td class="border p-2">{{ ucfirst(strtolower($customer['role'])) }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="4" class="border p-2 text-center">No customers found.</td>
+                    </tr>
+                @endif
             </tbody>
         </table>
     </div>
