@@ -17,32 +17,41 @@ class SellerDishController extends Controller
     // View offered dishes
     public function index(Request $request)
     {
-        // Retrieve the company ID (from the authenticated user or request headers)
         $companyId = auth()->user()->company_id ?? $request->header('X-Company-Id');
-
-        // Add the company ID to the headers
         $headers = [
             'X-Company-Id' => $companyId,
         ];
 
-        // Make the API call with the headers
         $dishes = $this->api->get('/dish-inventory-service/api/dishes', [], $headers);
+
+        // Handle API error
+        if (isset($dishes['error'])) {
+            return redirect()->back()->withErrors(['dishes' => $dishes['error']]);
+        }
+
+        // Ensure $dishes is always an array
+        $dishes = is_array($dishes) ? $dishes : [];
 
         return view('seller.dishes', compact('dishes'));
     }
-
-
 
     // View sold dishes with customer & shipping info
     public function soldDishes(Request $request)
     {
         $companyId = auth()->user()->company_id ?? $request->header('X-Company-Id');
-
-        // Add the company ID to the headers
         $headers = [
             'X-Company-Id' => $companyId,
         ];
         $soldDishes = $this->api->get('order-payment-service/api/orders', [], $headers);
+
+        // Handle API error
+        if (isset($soldDishes['error'])) {
+            return redirect()->back()->withErrors(['soldDishes' => $soldDishes['error']]);
+        }
+
+        // Ensure $soldDishes is always an array
+        $soldDishes = is_array($soldDishes) ? $soldDishes : [];
+
         return view('seller.dishes.sold', compact('soldDishes'));
     }
 
@@ -61,18 +70,23 @@ class SellerDishController extends Controller
             'quantity' => 'required|integer|min:1',
             'description' => 'required|string',
             'companyId' => 'required|integer|exists:companies,id',
+            'calories' => 'required|integer|min:0',
         ]);
 
-        $data = [
+        $payload = [
             "name" => $data['name'],
             "description" => $data['description'],
             "calories" => $data['calories'],
             "price" => $data['price'],
-            "companyId" => $data['companyId'], // companyId from the request
-            "quantity" => $data['quantity'] // quantity in the inventory of the company
+            "companyId" => $data['companyId'],
+            "quantity" => $data['quantity']
         ];
 
-        $this->api->post('/dish-inventory-service/api/dishes', $data);
+        $response = $this->api->post('/dish-inventory-service/api/dishes', $payload);
+
+        if (isset($response['error'])) {
+            return redirect()->back()->withErrors(['dish' => $response['error']])->withInput();
+        }
 
         return redirect()->route('seller.dishes.index')->with('status', 'Dish added successfully!');
     }
@@ -81,6 +95,12 @@ class SellerDishController extends Controller
     public function edit($id)
     {
         $dish = $this->api->get("/dish-inventory-service/api/dishes/{$id}");
+
+        // Handle API error
+        if (isset($dish['error'])) {
+            return redirect()->back()->withErrors(['dish' => $dish['error']]);
+        }
+
         return view('seller.dishes.edit', compact('dish'));
     }
 
@@ -88,7 +108,6 @@ class SellerDishController extends Controller
     public function update(Request $request, $id)
     {
         $companyId = auth()->user()->company_id ?? $request->header('X-Company-Id');
-        // Add the company ID to the headers
         $headers = [
             'X-Company-Id' => $companyId,
         ];
@@ -100,7 +119,11 @@ class SellerDishController extends Controller
             'calories' => 'required|integer|min:0',
         ]);
 
-        $this->api->put("/dishes/{$id}", $data, $headers);
+        $response = $this->api->put("/dish-inventory-service/api/dishes/{$id}", $data, $headers);
+
+        if (isset($response['error'])) {
+            return redirect()->back()->withErrors(['dish' => $response['error']])->withInput();
+        }
 
         return redirect()->route('seller.dishes.index')->with('status', 'Dish updated successfully!');
     }

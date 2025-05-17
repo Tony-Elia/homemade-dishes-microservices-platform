@@ -50,7 +50,7 @@ class RegisteredUserController extends Controller
                 'name'     => $request->name,
                 'email'    => $request->email,
                 'password' => Hash::make($request->password),
-                'role' => 'customer'
+                'role'     => 'customer', // Default role
             ]);
 
             Auth::login($user);
@@ -65,6 +65,7 @@ class RegisteredUserController extends Controller
             event(new Registered($user));
 
             DB::commit();
+
             return redirect(route('dashboard', absolute: false));
 
         } catch (\Exception $e) {
