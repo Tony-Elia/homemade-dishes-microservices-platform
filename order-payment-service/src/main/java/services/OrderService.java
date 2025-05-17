@@ -171,9 +171,9 @@ public class OrderService {
 		Order order = em.find(Order.class, reply.getOrderId());
 		order.setStatus(reply.getStatus());
 		String s = "accepted";
-		em.merge(order);
 		if(reply.getStatus() != OrderStatus.REQUESTED) {
 			updateCompanyIdForOrder(reply.getOrderId(), reply.getCheckList());
+			em.merge(order);
 		} else {
 			em.remove(order);
 			s = "rejected";

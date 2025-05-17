@@ -1,6 +1,8 @@
 package services;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import models.Order;
@@ -11,6 +13,7 @@ import services.exceptions.ServiceException;
 public class PaymentService {
 	@Inject
 	EntityManager em;
+	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 	public void pay(Long orderId) {
 		Order order = em.find(Order.class, orderId);
 		
