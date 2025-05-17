@@ -20,19 +20,30 @@ class AdminSellerRepController extends Controller
     {
         try {
             $reps = $this->api->get('/user-management-service/api/users/seller-representatives');
-            // $reps=User::where('role', 'seller')->get();
+
+            // Handle API error
+            if (isset($reps['error'])) {
+                return redirect()->back()->withErrors(['reps' => $reps['error']]);
+            }
+
+            // If API returns ['data' => [...]], extract the array
+            if (isset($reps['data'])) {
+                $reps = $reps['data'];
+            }
+
+            // Always pass an array
+            $reps = is_array($reps) ? $reps : [];
+
             return view('admin.seller_reps', compact('reps'));
         } catch (\Exception $e) {
-            // Log the error for debugging
             Log::error('Error fetching seller representatives: ' . $e->getMessage());
-
-            // Redirect back with an error message
             return redirect()->back()->withErrors(['error' => 'Failed to fetch seller representatives. Please try again later.']);
         }
     }
 
-    public function assign($company_id){
-        return view('admin.create_seller_rep',['company_id' => $company_id]);
+    public function assign($company_id)
+    {
+        return view('admin.create_seller_rep', ['company_id' => $company_id]);
     }
 
     public function create(Request $request)
@@ -49,28 +60,30 @@ class AdminSellerRepController extends Controller
 
         // Create the user in the database
         $user = User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'password' => bcrypt($randomPassword), // Hash the password
+            'name'       => $validated['name'],
+            'email'      => $validated['email'],
+            'password'   => bcrypt($randomPassword),
             'company_id' => $validated['company_id'],
-            'role'     => 'seller',
+            'role'       => 'seller',
         ]);
 
         try {
             // Make the API call to register the representative
-            $this->api->post('/user-management-service/api/users/register/representative', [
-                'email' => $validated['email'],
-                'name' => $validated['name'],
+            $response = $this->api->post('/user-management-service/api/users/register/representative', [
+                'email'     => $validated['email'],
+                'name'      => $validated['name'],
                 'companyId' => $validated['company_id'],
             ]);
 
-            // Redirect to a success page or back with a success message
-            return redirect()->route('admin.seller_representatives')->with('status', 'Seller representative created successfully. Password: ' . $randomPassword);
-        } catch (\Exception $e) {
-            // Log the error for debugging
-            Log::error('Error creating seller representative: ' . $e->getMessage());
+            // Handle API error
+            if (isset($response['error'])) {
+                return redirect()->back()->withErrors(['error' => $response['error']]);
+            }
 
-            // Redirect back with an error message
+            return redirect()->route('admin.seller_representatives')
+                ->with('status', 'Seller representative created successfully. Password: ' . $randomPassword);
+        } catch (\Exception $e) {
+            Log::error('Error creating seller representative: ' . $e->getMessage());
             return redirect()->back()->withErrors(['error' => 'Failed to create seller representative. Please try again later.']);
         }
     }

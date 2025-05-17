@@ -19,12 +19,30 @@ class CustomerOrderController extends Controller
     {
         $mail = auth()->user()->email;
         $orders = $this->api->get("/orders/{$mail}");
+
+        // Handle API error
+        if (isset($orders['error'])) {
+            return redirect()->back()->withErrors(['orders' => $orders['error']]);
+        }
+
+        // Ensure $orders is always an array
+        $orders = is_array($orders) ? $orders : [];
+
         return view('customer.orders.index', compact('orders'));
     }
 
     public function showAll()
     {
         $dishes = $this->api->get("/dish-inventory-service/api/dishes/all");
+
+        // Handle API error
+        if (isset($dishes['error'])) {
+            return redirect()->back()->withErrors(['dishes' => $dishes['error']]);
+        }
+
+        // Ensure $dishes is always an array
+        $dishes = is_array($dishes) ? $dishes : [];
+
         return view('customer.dishes.show-all', compact('dishes'));
     }
 
@@ -35,8 +53,12 @@ class CustomerOrderController extends Controller
         $dishId = $request->input('dish_id');
         $quantity = $request->input('quantity', 1);
 
-        // Get dish details (optional, for validation/display)
         $dish = $this->api->get("/dish-inventory-service/api/dishes/{$dishId}");
+
+        // Handle API error
+        if (isset($dish['error'])) {
+            return redirect()->back()->withErrors(['cart' => $dish['error']]);
+        }
 
         $cart = session()->get('cart', []);
 
@@ -61,6 +83,16 @@ class CustomerOrderController extends Controller
     {
         $cart = session('cart', []);
         $shippingCompanies = $this->api->get('/order-payment-service/api/shipping-companies');
+
+        // Handle API error
+        if (isset($shippingCompanies['error'])) {
+            $shippingCompanies = [];
+            return view('customer.orders.cart', compact('cart', 'shippingCompanies'))
+                ->withErrors(['shipping' => $shippingCompanies['error']]);
+        }
+
+        $shippingCompanies = is_array($shippingCompanies) ? $shippingCompanies : [];
+
         return view('customer.orders.cart', compact('cart', 'shippingCompanies'));
     }
 
@@ -81,8 +113,7 @@ class CustomerOrderController extends Controller
             return redirect()->route('customer.cart')->withErrors(['cart' => 'Your cart is empty.']);
         }
 
-        // Optionally, get shipping company ID from request or user profile
-        $shippingCompanyId = $request->input('shipping_company_id'); // or set a default
+        $shippingCompanyId = $request->input('shipping_company_id');
 
         $items = [];
         foreach ($cart as $item) {
@@ -105,12 +136,10 @@ class CustomerOrderController extends Controller
             return redirect()->route('customer.cart')->withErrors(['order' => $response['error']]);
         }
 
-        // After successful order placement
         if (isset($response['id'])) {
             session(['last_order_id' => $response['id']]);
-            session(['last_order_status' => strtolower($response['status'])]); // e.g., 'requested'
+            session(['last_order_status' => strtolower($response['status'])]);
             session()->forget('cart');
-            // Redirect to payment page
             $paymentDetails = $this->api->get("/order-payment-service/api/pay/{$response['id']}");
             if (isset($paymentDetails['error'])) {
                 return redirect()->route('customer.cart')->withErrors(['payment' => $paymentDetails['error']]);
