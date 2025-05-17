@@ -44,4 +44,9 @@ class AdminCompanyController extends Controller
         // Handle success
         return redirect()->back()->with('status', 'Companies created successfully.');
     }
+
+    public function create()
+    {
+        return view('admin.create_companies');
+    }
 }

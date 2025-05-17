@@ -22,8 +22,8 @@
                 <ul class="list-disc pl-5">
                     @foreach ($companies as $company)
                         <li>
-                            <span class="font-semibold">{{ $company->name }}</span>
-                            <a href="{{ route('admin.seller.assign', ['company_id' => $company->id]) }}" class="text-blue-600 hover:underline ml-2">
+                            <span class="font-semibold">{{ $company['name'] }}</span>
+                            <a href="{{ route('admin.seller.assign', ['company_id' => $company['id']]) }}" class="text-blue-600 hover:underline ml-2">
                                 Create Sellers
                             </a>
                         </li>

@@ -41,13 +41,4 @@ public class InventoryCheckMQ {
             throw new RuntimeException("Failed to send message to queue", e);
         }
     }
-
-    public void close() {
-        try {
-            channel.close();
-            connection.close();
-        } catch (Exception e) {
-            // Log
-        }
-    }
 }

@@ -156,9 +156,9 @@ public class OrderService {
 	        .put(Entity.entity(payload, MediaType.APPLICATION_JSON));
 
 	    if (response.getStatus() == 200 || response.getStatus() == 204) {
-	        System.out.println("Order status updated successfully.");
+	        System.out.println(">>>> Order status updated successfully.");
 	    } else {
-	        System.err.println("Failed to update order status: " + response.getStatus());
+	        System.err.println(">>>> Failed to update order status: " + response.getStatus());
 	    }
 
 	    response.close();

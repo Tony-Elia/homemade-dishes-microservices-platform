@@ -8,6 +8,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
@@ -43,32 +44,34 @@ class RegisteredUserController extends Controller
         ]);
 
         try {
+            DB::beginTransaction();
             // Create Laravel user locally
             $user = User::create([
                 'name'     => $request->name,
                 'email'    => $request->email,
                 'password' => Hash::make($request->password),
+                'role' => 'customer'
             ]);
 
+            Auth::login($user);
             // Send user to Java EE API
-            $this->api->post('/user-management-service/api/users/register/customer', [
+            $response = $this->api->post('/user-management-service/api/users/register/customer', [
                 'name'  => $user->name,
                 'email' => $user->email,
-                'role'  => 'customer'
             ]);
+
+            if(isset($response['status']) && $response['status'] > 399) throw new \Exception($response['error']);
 
             event(new Registered($user));
 
-            Auth::login($user);
-
-            
-
+            DB::commit();
             return redirect(route('dashboard', absolute: false));
 
         } catch (\Exception $e) {
+            DB::rollBack();
             \Log::error('Failed to register user in Java EE system: ' . $e->getMessage());
             return redirect()->back()->withErrors([
-                'registration' => 'Failed to register your account on our server. Please try again later.',
+                'registration' => 'Error: ' . $e->getMessage(),
             ])->withInput();
         }
     }

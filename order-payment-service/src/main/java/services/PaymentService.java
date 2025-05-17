@@ -18,8 +18,9 @@ public class PaymentService {
 		if(order.getShippingCompany().getMinCharge() > order.getTotalAmount()) {
 			em.remove(order);
 			throw new ServiceException("Minimum charge is not met in the order", 400);
+		} else {
+			order.setStatus(OrderStatus.COMPLETED);
+			em.merge(order);			
 		}
-		order.setStatus(OrderStatus.COMPLETED);
-		em.merge(order);
 	}
 }
