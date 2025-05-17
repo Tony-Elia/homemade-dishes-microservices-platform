@@ -18,14 +18,20 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($reps as $rep)
-                <tr>
-                    <td class="border p-2">{{ $rep['id'] }}</td>
-                    <td class="border p-2">{{ $rep['name'] }}</td>
-                    <td class="border p-2">{{ $rep['email'] }}</td>
-                    <td class="border p-2">{{ $rep['companyName'] ?? 'N/A' }}</td>
-                </tr>
-                @endforeach
+                @if(is_array($reps) && count($reps))
+                    @foreach ($reps as $rep)
+                        <tr>
+                            <td class="border p-2">{{ $rep['id'] }}</td>
+                            <td class="border p-2">{{ $rep['name'] }}</td>
+                            <td class="border p-2">{{ $rep['email'] }}</td>
+                            <td class="border p-2">{{ $rep['companyName'] ?? 'N/A' }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="4" class="border p-2 text-center">No seller representatives found.</td>
+                    </tr>
+                @endif
             </tbody>
         </table>
     </div>

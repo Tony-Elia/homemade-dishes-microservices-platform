@@ -48,6 +48,7 @@ class RegisteredUserController extends Controller
                 'name'     => $request->name,
                 'email'    => $request->email,
                 'password' => Hash::make($request->password),
+                'role'     => 'customer', // Default role
             ]);
 
             // Send user to Java EE API
@@ -60,7 +61,7 @@ class RegisteredUserController extends Controller
             event(new Registered($user));
 
             Auth::login($user);
-
+            $request->session()->regenerate();
             
 
             return redirect(route('dashboard', absolute: false));

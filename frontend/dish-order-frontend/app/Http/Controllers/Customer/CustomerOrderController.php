@@ -60,7 +60,7 @@ class CustomerOrderController extends Controller
     public function viewCart()
     {
         $cart = session('cart', []);
-        $shippingCompanies = $this->api->get('order-payment-service/api/shipping-companies');
+        $shippingCompanies = $this->api->get('/order-payment-service/api/shipping-companies');
         return view('customer.orders.cart', compact('cart', 'shippingCompanies'));
     }
 
@@ -99,7 +99,7 @@ class CustomerOrderController extends Controller
             'shippingCompanyId' => $shippingCompanyId,
         ];
 
-        $response = $this->api->post('order-payment-service/api/orders', $payload);
+        $response = $this->api->post('/order-payment-service/api/orders', $payload);
 
         if (isset($response['error'])) {
             return redirect()->route('customer.cart')->withErrors(['order' => $response['error']]);
@@ -111,7 +111,7 @@ class CustomerOrderController extends Controller
             session(['last_order_status' => strtolower($response['status'])]); // e.g., 'requested'
             session()->forget('cart');
             // Redirect to payment page
-            $paymentDetails = $this->api->get("order-payment-service/api/pay/{$response['id']}");
+            $paymentDetails = $this->api->get("/order-payment-service/api/pay/{$response['id']}");
             if (isset($paymentDetails['error'])) {
                 return redirect()->route('customer.cart')->withErrors(['payment' => $paymentDetails['error']]);
             }
