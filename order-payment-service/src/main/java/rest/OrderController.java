@@ -6,6 +6,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -15,6 +16,7 @@ import javax.ws.rs.core.Response;
 import DTO.OrderDTO;
 import models.Order;
 import services.OrderService;
+import services.PaymentService;
 
 @RequestScoped
 @Path("/orders")
@@ -23,6 +25,9 @@ import services.OrderService;
 public class OrderController {
 	@Inject
 	OrderService service;
+	
+	@Inject
+	PaymentService paymentService;
 
 	@POST
 	public Response create(final Order order) {
@@ -30,9 +35,13 @@ public class OrderController {
 	}
 
 	@GET
-	@Path("/{id:[0-9]+}")
-	public List<OrderDTO> listAll(@PathParam("id") Long userId) {
-		return service.all(userId);
+	@Path("/{email}")
+	public List<OrderDTO> listAll(@PathParam("email") String userEmail) {
+		return service.all(userEmail);
 	}
-
+	
+	@GET
+	public List<OrderDTO> listAll(@HeaderParam("X-Company-Id") Long companyId) {
+		return service.all(companyId);
+	}
 }

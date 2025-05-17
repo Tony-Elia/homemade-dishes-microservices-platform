@@ -57,6 +57,16 @@ public class DishService {
 		return newDishes;
 	}
 
+	public List<DishDTO> listAll() {
+		List<Dish> dishes = em.createQuery("SELECT d FROM Dish d", Dish.class).getResultList();
+		
+		List<DishDTO> newDishes = new ArrayList<>();
+		for(Dish d : dishes) {
+			newDishes.add(DishDTO.from(d));
+		}
+		return newDishes;
+	}
+	
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void update(Long id, DishDTO dish, Long companyId) {
 		Dish newDish = em.find(Dish.class, id);
