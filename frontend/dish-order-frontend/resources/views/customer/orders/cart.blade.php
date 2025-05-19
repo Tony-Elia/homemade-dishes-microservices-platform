@@ -11,7 +11,13 @@
         @if(empty($cart))
             <p>Your cart is empty.</p>
         @else
-            <form action="{{ route('customer.cart.place_order') }}" method="POST">
+            @php
+                $cartTotal = 0;
+                foreach ($cart as $item) {
+                    $cartTotal += $item['price'] * $item['quantity'];
+                }
+            @endphp
+            <form id="orderForm" action="{{ route('customer.cart.place_order') }}" method="POST">
                 @csrf
                 <table class="w-full table-auto border border-gray-300 mt-4">
                     <thead class="bg-gray-200">
@@ -39,13 +45,17 @@
                     </tbody>
                 </table>
 
+                <div class="mt-4 font-bold">
+                    Cart Total: $<span id="cartTotal">{{ number_format($cartTotal, 2) }}</span>
+                </div>
+
                 <!-- Shipping Company Selection -->
                 <div class="mt-4">
                     <label for="shipping_company_id" class="block font-semibold mb-1">Choose Shipping Company:</label>
                     <select name="shipping_company_id" id="shipping_company_id" class="border rounded p-2 w-full" required>
                         <option value="">-- Select --</option>
                         @foreach($shippingCompanies as $company)
-                            <option value="{{ $company['id'] }}">
+                            <option value="{{ $company['id'] }}" data-min-charge="{{ $company['minCharge'] }}">
                                 {{ $company['name'] }} (Min Charge: ${{ $company['minCharge'] }})
                             </option>
                         @endforeach
@@ -54,6 +64,18 @@
 
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded mt-4">Place Order</button>
             </form>
+            <script>
+                document.getElementById('orderForm').addEventListener('submit', function(e) {
+                    var cartTotal = parseFloat(document.getElementById('cartTotal').innerText);
+                    var select = document.getElementById('shipping_company_id');
+                    var selectedOption = select.options[select.selectedIndex];
+                    var minCharge = parseFloat(selectedOption.getAttribute('data-min-charge'));
+                    if (!isNaN(minCharge) && cartTotal < minCharge) {
+                        alert('Your cart total ($' + cartTotal.toFixed(2) + ') is less than the minimum charge for this shipping company ($' + minCharge.toFixed(2) + '). Please add more items or choose another company.');
+                        e.preventDefault();
+                    }
+                });
+            </script>
         @endif
     </div>
 </x-app-layout>
