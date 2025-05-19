@@ -1,15 +1,12 @@
 package services;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
-import javax.json.JsonObject;
 import javax.persistence.EntityManager;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -47,7 +44,6 @@ public class OrderService {
 	public OrderDTO create(Order order) {
 		if(order.hasNullAttr()) throw new ServiceException("Missing some attributes", 400);
 		
-		order.setShippingCompany(findShippinCompanyById(order.getShippingCompany().getId()));
 		
 		List<OrderItem> items = order.getItems();
 		order.setItems(null);
@@ -62,6 +58,9 @@ public class OrderService {
 			total += item.getPriceAtPurchase() * item.getQuantity();
 		}
 		
+		ShippingCompany shippingCompany = findShippinCompanyById(order.getShippingCompany().getId());
+		if(shippingCompany.getMinCharge() > total) throw new ServiceException("Total order amount is below the chosen Shipping company's minimum charge", 400);
+		order.setShippingCompany(shippingCompany);
 		order.setTotalAmount(total);
 		order.setStatus(OrderStatus.REQUESTED);
 		em.persist(order);
@@ -139,13 +138,13 @@ public class OrderService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void updateCompanyIdForOrder(Long orderId, List<InventoryCheckItem> items) {		
 		for(InventoryCheckItem item : items) {
-			em.createQuery("UPDATE OrderItem oi SET oi.companyId = :companyId WHERE oi.dishId = :dishId")
+			em.createQuery("UPDATE OrderItem oi SET oi.companyId = :companyId WHERE oi.dishId = :dishId AND orderId")
 				.setParameter("companyId", item.getCompanyId())
 				.setParameter("dishId", item.getDishId()).executeUpdate();
 		}
 	}
 
-	public void updateOrderStatus(Long orderId, String status) {
+	public void sendOrderStatusUpdate(Long orderId, String status) {
 	    OrderStatusUpdate payload = new OrderStatusUpdate(orderId, status);
 
 	    Client client = ClientBuilder.newClient();
@@ -179,6 +178,6 @@ public class OrderService {
 			s = "rejected";
 		}
 		
-		updateOrderStatus(order.getId(), s);
+		sendOrderStatusUpdate(order.getId(), s);
 	}
 }
