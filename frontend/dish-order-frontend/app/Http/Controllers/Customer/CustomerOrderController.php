@@ -144,10 +144,7 @@ class CustomerOrderController extends Controller
             session(['last_order_id' => $response['id']]);
             session(['last_order_status' => strtolower($response['status'])]);
             session()->forget('cart');
-            $paymentDetails = $this->api->get("/order-payment-service/api/pay/{$response['id']}");
-            if (isset($paymentDetails['error'])) {
-                return redirect()->route('customer.cart')->withErrors(['payment' => $paymentDetails['error']]);
-            }
+            
         }
 
         session()->forget('cart');
