@@ -10,7 +10,7 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.seller_reps.store') }}" method="POST" class="space-y-4">
+        <form action="{{ route('admin.seller.create') }}" method="POST" class="space-y-4">
             @csrf
             <input type="hidden" name="company_id" value="{{ $company_id }}">
 
@@ -20,7 +20,7 @@
             </div>
 
             <div>
-                <label class="block mb-1 font-semibold">Username</label>
+                <label class="block mb-1 font-semibold">Email</label>
                 <input type="email" name="email" class="border rounded p-2 w-full" placeholder="Username">
             </div>
 

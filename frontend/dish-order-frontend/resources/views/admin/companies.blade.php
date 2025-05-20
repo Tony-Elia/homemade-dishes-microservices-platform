@@ -21,11 +21,20 @@
                 <h2 class="text-xl font-bold mb-4">Companies</h2>
                 <ul class="list-disc pl-5">
                     @foreach ($companies as $company)
-                        <li>
-                            <span class="font-semibold">{{ $company['name'] }}</span>
-                            <a href="{{ route('admin.seller.assign', ['company_id' => $company['id']]) }}" class="text-blue-600 hover:underline ml-2">
-                                Create Sellers
-                            </a>
+                        <li class="mb-3">
+                            <div>
+                                <span class="font-semibold">{{ $company['name'] }}</span> - <small class="text-gray-600">{{ $company['region'] }}</small>
+                            </div>
+
+                            @if (isset($company['representative']))
+                                <div class="ml-4 text-sm text-gray-700">
+                                    Representative: {{ $company['representative']['name'] }} ({{ $company['representative']['email'] }})
+                                </div>
+                            @else
+                                <a href="{{ route('admin.seller.assign', ['company_id' => $company['id']]) }}" class="text-blue-600 hover:underline mt-1 inline-block">
+                                    Create Sellers
+                                </a>
+                            @endif
                         </li>
                     @endforeach
                 </ul>

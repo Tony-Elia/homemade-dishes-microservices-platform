@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -9,7 +11,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return view(\auth()->user()->role == 'seller' ? 'seller.dashboard' : 'dashboard');
 })->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -28,7 +30,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/companies', [\App\Http\Controllers\Admin\AdminCompanyController::class, 'store'])->name('admin.companies.store');
 
     Route::get('/admin/companies/create', [\App\Http\Controllers\Admin\AdminCompanyController::class, 'create'])->name('admin.companies.create');
-    Route::get('/admin/seller/create', [\App\Http\Controllers\Admin\AdminSellerRepController::class, 'create'])->name('admin.seller.create');
+    Route::post('/admin/seller/create', [\App\Http\Controllers\Admin\AdminSellerRepController::class, 'create'])->name('admin.seller.create');
     Route::get('/admin/seller/assign/{company_id}', [\App\Http\Controllers\Admin\AdminSellerRepController::class, 'assign'])->name('admin.seller.assign');
 });
 
@@ -57,15 +59,19 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::get('/customer/payment', [\App\Http\Controllers\Customer\CustomerOrderController::class, 'payment'])->name('customer.payment');
 });
 
-Route::put('api/orders/status', function(Request $request) {
-    $orderId = $request->input('orderId');
-    $status = $request->input('status');
-    if (session('last_order_id') == $orderId) {
-        session(['last_order_status' => $status]);
-        return redirect()->route('customer.orders.index')->with('status', $status == 'accepted' ? "Order Confirmed!" : "Order Rejected");
-    } else {
-        return response()->json(['error' => 'Order not found in session.'], 404);
+Route::get('/check-order-update', function () {
+    $userId = Auth::id();
+    $data = Cache::pull("order_update_$userId"); // Pull to delete after reading
+    Cache::delete("order_update_$userId");
+
+    if ($data) {
+        return response()->json([
+            'message' => $data['message'],
+            'order_id' => $data['order_id']
+        ]);
     }
+
+    return response()->json(['data' => null]);
 });
 
 

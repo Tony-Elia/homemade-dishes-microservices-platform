@@ -24,12 +24,12 @@
                             <td class="border p-2">{{ $rep['id'] }}</td>
                             <td class="border p-2">{{ $rep['name'] }}</td>
                             <td class="border p-2">{{ $rep['email'] }}</td>
-                            <td class="border p-2">{{ $rep['companyName'] ?? 'N/A' }}</td>
+                            <td class="border p-2">{{ isset($rep['company']) ? $rep['company']['name'] : 'N/A' }}</td>
                         </tr>
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="4" class="border p-2 text-center">No seller representatives found.</td>
+                        <td colspan="4" class="border p-2 text-cesnter">No seller representatives found.</td>
                     </tr>
                 @endif
             </tbody>

@@ -72,7 +72,7 @@ class AdminSellerRepController extends Controller
             $response = $this->api->post('/user-management-service/api/users/register/representative', [
                 'email'     => $validated['email'],
                 'name'      => $validated['name'],
-                'companyId' => $validated['company_id'],
+                'company_id' => $validated['company_id'],
             ]);
 
             // Handle API error

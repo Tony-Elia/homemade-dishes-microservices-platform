@@ -138,14 +138,16 @@ public class OrderService {
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void updateCompanyIdForOrder(Long orderId, List<InventoryCheckItem> items) {		
 		for(InventoryCheckItem item : items) {
-			em.createQuery("UPDATE OrderItem oi SET oi.companyId = :companyId WHERE oi.dishId = :dishId AND orderId")
-				.setParameter("companyId", item.getCompanyId())
-				.setParameter("dishId", item.getDishId()).executeUpdate();
+			em.createQuery("UPDATE OrderItem oi SET oi.companyId = :companyId WHERE oi.dishId = :dishId AND order_id = :orderId")
+			.setParameter("companyId", item.getCompanyId())
+			.setParameter("orderId", orderId)
+			.setParameter("dishId", item.getDishId()).executeUpdate();
 		}
 	}
 
-	public void sendOrderStatusUpdate(Long orderId, String status) {
-	    OrderStatusUpdate payload = new OrderStatusUpdate(orderId, status);
+	public void sendOrderStatusUpdate(Long orderId, String userEmail, String msg, boolean status) {
+	    OrderStatusUpdate payload = new OrderStatusUpdate(orderId, msg, status, userEmail);
+	    
 
 	    Client client = ClientBuilder.newClient();
 	    WebTarget target = client.target("http://localhost:8000/api/orders/status");
@@ -169,15 +171,17 @@ public class OrderService {
 		CheckInventoryReply reply = deserliazeCheckInventoryReply(payloadJson);
 		Order order = em.find(Order.class, reply.getOrderId());
 		order.setStatus(reply.getStatus());
-		String s = "accepted";
+		String s = "Order is Accpted";
+		boolean f = true;
 		if(reply.getStatus() != OrderStatus.REQUESTED) {
 			updateCompanyIdForOrder(reply.getOrderId(), reply.getCheckList());
 			em.merge(order);
 		} else {
 			em.remove(order);
-			s = "rejected";
+			s = "Not enough stock for the ordered items\nOrder Cancelled";
+			f = false;
 		}
 		
-		sendOrderStatusUpdate(order.getId(), s);
+		sendOrderStatusUpdate(order.getId(), order.getUserEmail(), s, f);
 	}
 }

@@ -57,4 +57,18 @@
             </table>
         @endif
     </div>
+
+    <script>
+        setInterval(() => {
+            fetch('/check-order-update')
+                .then(res => res.json())
+                .then(data => {
+                    if (data['order_id'] != null) {
+                        alert("Order ID: " + data['order_id'] + " Status changed.\n" + data['message']);
+                    }
+                });
+        }, 3000); // check every 3 seconds
+    </script>
+
+
 </x-app-layout>

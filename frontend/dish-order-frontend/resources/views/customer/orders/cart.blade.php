@@ -66,7 +66,7 @@
             </form>
             <script>
                 document.getElementById('orderForm').addEventListener('submit', function(e) {
-                    var cartTotal = parseFloat(document.getElementById('cartTotal').innerText);
+                    var cartTotal = parseFloat({{ $cartTotal }});
                     var select = document.getElementById('shipping_company_id');
                     var selectedOption = select.options[select.selectedIndex];
                     var minCharge = parseFloat(selectedOption.getAttribute('data-min-charge'));

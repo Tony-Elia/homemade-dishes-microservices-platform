@@ -1,9 +1,12 @@
 <?php
 namespace App\Http\Controllers\Customer;
 
+use App\Events\OrderStatusUpdate;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\JavaEeApiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class CustomerOrderController extends Controller
 {
@@ -144,20 +147,43 @@ class CustomerOrderController extends Controller
             session(['last_order_id' => $response['id']]);
             session(['last_order_status' => strtolower($response['status'])]);
             session()->forget('cart');
-            $paymentDetails = $this->api->get("/order-payment-service/api/pay/{$response['id']}");
-            if (isset($paymentDetails['error'])) {
-                return redirect()->route('customer.cart')->withErrors(['payment' => $paymentDetails['error']]);
-            }
         }
 
         session()->forget('cart');
         return redirect()->route('customer.orders.index')->with('status', 'Order sent, waiting for confirmation...');
     }
 
+    public function statusUpdated(Request $request)
+    {
+        $orderId = $request->orderId;
+        $status = $request->status;
+        $msg = $request->msg;
+        $userId = \App\Models\User::where('email', $request->userEmail)->first()->id;
+
+        if($status) {
+            Cache::put('order_update_' . $userId, ['order_id' => $orderId, 'message' => 'Order Placed successfully'], 10);
+            $response = $this->payByOrderId($orderId);
+            event(new OrderStatusUpdate($orderId, $status));
+            Log::alert("Received response from the payment:". $response);
+//            if($response != null && $response['error'])
+//                Cache::put('order_update_' . $userId, ['order_id' => $orderId, 'message' => $response['error']], 10);
+        } else
+            Cache::put('order_update_' . $userId, ['order_id' => $orderId, 'message' => $msg], 10);
+
+        \Illuminate\Support\Facades\Log::info("Received order status update for order: {$orderId} with status: {$status}, user: {$userId}, cache value: " . Cache::has('order_event_' . $userId));
+        return response()->json("Status Updated Successfully");
+    }
+
+    public function payByOrderId($order_id)
+    {
+        return $this->api->get("/order-payment-service/api/pay/{$order_id}");
+    }
+
     public function payment(Request $request)
     {
-        $response = $this->api->get("/order-payment-service/api/pay/{$request->query('order_id')}");
-        $response = $response['error'] ?? $response;
+        $order_id = $request->order_id;
+        $res = $this->payByOrderId($order_id);
+        $response = $res['error'] ?? $res;
         return redirect()->route('customer.orders.index')->with('status', $response);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\JavaEeApiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SellerDishController extends Controller
 {
@@ -17,9 +18,8 @@ class SellerDishController extends Controller
     // View offered dishes
     public function index(Request $request)
     {
-        $companyId = auth()->user()->company_id ?? $request->header('X-Company-Id');
         $headers = [
-            'X-Company-Id' => $companyId,
+            'X-Company-Id' => $this->getSellerCompanyId(),
         ];
 
         $dishes = $this->api->get('/dish-inventory-service/api/dishes', [], $headers);
@@ -32,17 +32,16 @@ class SellerDishController extends Controller
         // Ensure $dishes is always an array
         $dishes = is_array($dishes) ? $dishes : [];
 
-        return view('seller.dishes', compact('dishes'));
+        return view('seller.dishes.index', compact('dishes'));
     }
 
     // View sold dishes with customer & shipping info
     public function soldDishes(Request $request)
     {
-        $companyId = auth()->user()->company_id ?? $request->header('X-Company-Id');
         $headers = [
-            'X-Company-Id' => $companyId,
+            'X-Company-Id' => $this->getSellerCompanyId(),
         ];
-        $soldDishes = $this->api->get('order-payment-service/api/orders', [], $headers);
+        $soldDishes = $this->api->get('/order-payment-service/api/orders', [], $headers);
 
         // Handle API error
         if (isset($soldDishes['error'])) {
@@ -69,7 +68,6 @@ class SellerDishController extends Controller
             'price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:1',
             'description' => 'required|string',
-            'companyId' => 'required|integer|exists:companies,id',
             'calories' => 'required|integer|min:0',
         ]);
 
@@ -78,7 +76,7 @@ class SellerDishController extends Controller
             "description" => $data['description'],
             "calories" => $data['calories'],
             "price" => $data['price'],
-            "companyId" => $data['companyId'],
+            "companyId" => $this->getSellerCompanyId(),
             "quantity" => $data['quantity']
         ];
 
@@ -107,9 +105,8 @@ class SellerDishController extends Controller
     // Update a dish
     public function update(Request $request, $id)
     {
-        $companyId = auth()->user()->company_id ?? $request->header('X-Company-Id');
         $headers = [
-            'X-Company-Id' => $companyId,
+            'X-Company-Id' => $this->getSellerCompanyId(),
         ];
         $data = $request->validate([
             'name' => 'required|string',
@@ -126,5 +123,9 @@ class SellerDishController extends Controller
         }
 
         return redirect()->route('seller.dishes.index')->with('status', 'Dish updated successfully!');
+    }
+
+    private function getSellerCompanyId() {
+        return $this->api->get("/user-management-service/api/users/" . Auth::user()->email)['company']['id'];
     }
 }
