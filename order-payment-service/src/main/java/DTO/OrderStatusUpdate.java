@@ -11,5 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderStatusUpdate {
     private Long orderId;
-    private String status;
+    private String msg;
+    private boolean status;
+    private String userEmail;
 }
